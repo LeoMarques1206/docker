@@ -14,8 +14,8 @@ tipos_requisicao = {
     "/wp-content/uploads/2024/10/626311.jpg": "post com imagem de 1mb"
 }
 
-tempo_resposta_por_tipo = {
-    tipo: {spawn_rate: [] for spawn_rate in spawn_rates} 
+requisicoes_por_segundo = {
+    tipo: {spawn_rate: [] for spawn_rate in spawn_rates}
     for tipo in tipos_requisicao.keys()
 }
 
@@ -30,33 +30,35 @@ for n_usuarios in num_usuarios:
             for tipo in tipos_requisicao.keys():
                 tipo_data = data[data["Name"] == tipo]
                 if not tipo_data.empty:
-                    media_resposta = tipo_data["Average Response Time"].mean()
-                    tempo_resposta_por_tipo[tipo][spawn_rate].append(media_resposta)
+                    requisicoes_segundo = tipo_data["Requests/s"].mean()
+                    requisicoes_por_segundo[tipo][spawn_rate].append(requisicoes_segundo)
                 else:
-                    tempo_resposta_por_tipo[tipo][spawn_rate].append(None)
+                    requisicoes_por_segundo[tipo][spawn_rate].append(0) 
         else:
             print(f"Arquivo {filename} não encontrado.")
             for tipo in tipos_requisicao.keys():
-                tempo_resposta_por_tipo[tipo][spawn_rate].append(None)
+                requisicoes_por_segundo[tipo][spawn_rate].append(0)
 
-# gera graficos
 for tipo, label in tipos_requisicao.items():
-    tempos_por_spawn = tempo_resposta_por_tipo[tipo]
+
+    dados_por_spawn = requisicoes_por_segundo[tipo]
     fig, ax = plt.subplots(figsize=(10, 6))
-    width = 0.25  
+    width = 0.25 
 
-    x = np.arange(len(num_usuarios))  #numero de ususarios
+    x = np.arange(len(num_usuarios))  # valoers do numero de usuario
 
-    for i, (spawn_label, tempos) in enumerate(tempos_por_spawn.items()):
-        ax.bar(x + i * width, tempos, width, label=f"Instancia {spawn_label}")
+    # barras por taxa de spawn
+    for i, (spawn_rate, dados) in enumerate(dados_por_spawn.items()):
+        ax.bar(x + i * width, dados, width, label=f"Instância {spawn_rate} usuários/s")
 
     ax.set_xlabel("Número de Usuários")
-    ax.set_ylabel("Tempo de resposta médio (s)")
-    ax.set_title(f"Tempo de Resposta para '{label}' por Número de Usuários e Instancia")
+    ax.set_ylabel("Requisições por Segundo")
+    ax.set_title(f"Requisições por Segundo para '{label}' por Número de Usuários e Instância")
     ax.set_xticks(x + width)
     ax.set_xticklabels(num_usuarios)
-    ax.legend(title="Instancia (usuários/s)")
+    ax.legend(title="Instância (usuários/s)")
     ax.grid(True, axis='y', linestyle='--', alpha=0.7)
 
-    plt.savefig(f"grafico_{label.replace(' ', '_')}.png")
+    plt.tight_layout()
+    plt.savefig(f"grafico_requisicoes_{label.replace(' ', '_')}.png")
     plt.close(fig)

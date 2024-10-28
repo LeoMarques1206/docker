@@ -68,15 +68,14 @@ services:
     image: grubykarol/locust
     container_name: locust
     environment:
-      ATTACKED_HOST: http://nginx  # Define o host do teste como o serviço do nginx
-      LOCUST_FILE: /locust/locustfile.py # Script locust para teste
-      LOCUST_OPTS: "--users 10 --spawn-rate 1" # Parâmetros atualizados para usuários e taxa de spawn
+      ATTACKED_HOST: http://nginx
     volumes:
-      - ./locust-scripts:/locust # Volume para os scripts do Locust
+      - ./locust-scripts:/locust
     ports:
-      - "8089:8089" # Porta de interface do Locust
+      - "8089:8089"
     depends_on:
-      - nginx # Locust espera o nginx iniciar
+      - nginx
+
 
 volumes:
   db_data:

@@ -76,6 +76,5 @@ services:
     depends_on:
       - nginx
 
-
 volumes:
   db_data:

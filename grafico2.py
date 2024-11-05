@@ -5,7 +5,7 @@ import os
 
 data_path = './csvs'
 
-num_usuarios = [10, 100, 1000]
+num_usuarios = [10, 700, 1000]
 spawn_rates = [1.0, 2.0, 3.0]
 
 tipos_requisicao = {
